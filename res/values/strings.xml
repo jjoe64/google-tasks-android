@@ -3,5 +3,9 @@
 
     <string name="hello">Hello World, TasksActivity!</string>
     <string name="app_name">GoogleTasks</string>
+    <string name="name">Name</string>
+    <string name="due_date">Due Date</string>
+    <string name="notes">Notes</string>
+    <string name="done">Mark as done</string>
 
 </resources>
