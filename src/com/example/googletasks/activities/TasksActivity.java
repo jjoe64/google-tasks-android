@@ -2,17 +2,21 @@ package com.example.googletasks.activities;
 
 import android.app.ListActivity;
 import android.content.AsyncQueryHandler;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.CheckBox;
 import android.widget.CursorAdapter;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.ResourceCursorAdapter;
+import android.widget.TextView;
 
 import com.example.googletasks.R;
+import com.example.googletasks.content.TaskModel;
 import com.example.googletasks.content.TasksContentProvider;
 
 public class TasksActivity extends ListActivity {
@@ -24,17 +28,22 @@ public class TasksActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tasks);
 
-		// setup list
-		ListView list = getListView();
-		list.setAdapter(cursorAdapter = new SimpleCursorAdapter(getApplicationContext(), R.layout.list_tasks_item, null, new String[] {
-			"NAME"
-			, "NOTES"
-			, "DUE_DATE"
-		}, new int[] {
-			R.id.list_tasks_item_name
-			, R.id.list_tasks_item_notes
-			, R.id.list_tasks_item_due_date
-		}));
+		// setup list adapter
+		cursorAdapter = new ResourceCursorAdapter(getApplicationContext(), R.layout.list_tasks_item, null) {
+			@Override
+			public void bindView(View view, Context context, Cursor cursor) {
+				CheckBox name = (CheckBox) view.findViewById(R.id.list_tasks_item_name);
+				TextView notes = (TextView) view.findViewById(R.id.list_tasks_item_notes);
+				TextView dueDate = (TextView) view.findViewById(R.id.list_tasks_item_due_date);
+
+				TaskModel mdl = TaskModel.parse(cursor);
+				name.setChecked(mdl.isDone());
+				name.setText(mdl.getName());
+				notes.setText(mdl.getNotes());
+				dueDate.setText(mdl.getDueDate()==null?"":mdl.getDueDate().toString()); // TODO format
+			}
+		};
+		setListAdapter(cursorAdapter);
 
 		// load cursor
 		AsyncQueryHandler query = new AsyncQueryHandler(getContentResolver()) {

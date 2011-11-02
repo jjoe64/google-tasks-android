@@ -41,10 +41,10 @@ public class TasksContentProvider extends ContentProvider {
 				"_ID", "NAME", "DONE", "DUE_DATE", "NOTES"
 		}, 2);
 		cursor.addRow(new Object[] {
-				0, "Auto waschen", false, null, "maximal 10 €"
+				0, "Auto waschen", 0, null, "maximal 10 €"
 		});
 		cursor.addRow(new Object[] {
-				1, "Postbank kündigen", true, new Date(), null
+				1, "Postbank kündigen", 1, new Date().getTime(), null
 		});
 		return cursor;
 	}
