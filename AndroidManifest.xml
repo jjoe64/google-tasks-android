@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.EditTaskActivity"></activity>
+        <provider android:authorities="com.example.googletasks.contentprovider" android:name=".content.TasksContentProvider"></provider>
     </application>
 
 </manifest>
