@@ -50,6 +50,7 @@ public class TasksActivity extends ListActivity {
 			@Override
 			protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
 				cursorAdapter.changeCursor(cursor);
+				startManagingCursor(cursor);
 			}
 		};
 		query.startQuery(0, 0, TasksContentProvider.CONTENT_URI, null, null, null, null);
@@ -66,7 +67,7 @@ public class TasksActivity extends ListActivity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		if (item.getItemId() == R.id.menuitem_new) {
 			Intent intent = new Intent(getApplicationContext(), EditTaskActivity.class);
-			startActivity(intent); // TODO startActivityForResult
+			startActivity(intent);
 			return true;
 		} else {
 			return super.onMenuItemSelected(featureId, item);

@@ -1,19 +1,55 @@
 package com.example.googletasks.content;
 
-import java.util.Date;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
-import android.database.MatrixCursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
 public class TasksContentProvider extends ContentProvider {
+	private static class DatabaseHelper extends SQLiteOpenHelper {
+		DatabaseHelper(Context context) {
+			super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		}
+
+		@Override
+		public void onCreate(SQLiteDatabase db) {
+			TaskModel.createTable(db);
+		}
+
+		@Override
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			TaskModel.dropTable(db);
+			onCreate(db);
+		}
+	}
+
+	private static final String DATABASE_NAME = "tasks.db";
+	private static final int DATABASE_VERSION = 2;
+
 	public static final Uri CONTENT_URI = Uri.parse("content://com.example.googletasks.contentprovider");
 
+	private DatabaseHelper dbHelper;
+
 	@Override
-	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		// TODO Auto-generated method stub
+	public int delete(Uri uri, String where, String[] whereArgs) {
+		/*
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		int count;
+		switch (sUriMatcher.match(uri)) {
+		case NOTES:
+		count = db.delete(NOTES_TABLE_NAME, where, whereArgs);
+		break;
+
+		default:
+		throw new IllegalArgumentException("Unknown URI " + uri);
+		}
+
+		getContext().getContentResolver().notifyChange(uri, null);
+		return count;
+		*/
 		return 0;
 	}
 
@@ -25,28 +61,28 @@ public class TasksContentProvider extends ContentProvider {
 
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
-		// TODO Auto-generated method stub
+		dbHelper.getWritableDatabase().insert(TaskModel.TABLE_NAME, null, values);
+		getContext().getContentResolver().notifyChange(uri, null);
 		return null;
 	}
 
 	@Override
 	public boolean onCreate() {
-		// TODO Auto-generated method stub
-		return false;
+		dbHelper = new DatabaseHelper(getContext());
+		return true;
 	}
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-		MatrixCursor cursor = new MatrixCursor(new String[] {
-				"_ID", "NAME", "DONE", "DUE_DATE", "NOTES"
-		}, 2);
-		cursor.addRow(new Object[] {
-				0, "Auto waschen", 0, null, "maximal 10 €"
-		});
-		cursor.addRow(new Object[] {
-				1, "Postbank kündigen", 1, new Date().getTime(), null
-		});
-		return cursor;
+		return dbHelper.getReadableDatabase().query(
+				TaskModel.TABLE_NAME
+				, null // columns
+				, selection
+				, selectionArgs
+				, null // groupBy
+				, null // having
+				, null // orderBy
+		);
 	}
 
 	@Override

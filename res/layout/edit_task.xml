@@ -11,7 +11,7 @@
         android:text="@string/name" />
 
     <EditText
-        android:id="@+id/editText1"
+        android:id="@+id/edit_task_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
@@ -19,19 +19,19 @@
     </EditText>
 
     <CheckBox
-        android:id="@+id/checkBox2"
+        android:id="@+id/edit_task_done"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/done" />
 
     <CheckBox
-        android:id="@+id/checkBox1"
+        android:id="@+id/edit_task_cb_due_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/due_date" />
 
     <DatePicker
-        android:id="@+id/datePicker1"
+        android:id="@+id/edit_task_due_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -42,9 +42,15 @@
         android:text="@string/notes" />
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/edit_task_notes"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/edit_task_save"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/save" />
 
 </LinearLayout>
