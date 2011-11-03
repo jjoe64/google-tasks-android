@@ -27,7 +27,7 @@ public class TasksContentProvider extends ContentProvider {
 	}
 
 	private static final String DATABASE_NAME = "tasks.db";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
 	public static final Uri CONTENT_URI = Uri.parse("content://com.example.googletasks.contentprovider");
 

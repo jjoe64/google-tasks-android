@@ -40,7 +40,7 @@ public class TasksActivity extends ListActivity {
 				name.setChecked(mdl.isDone());
 				name.setText(mdl.getName());
 				notes.setText(mdl.getNotes());
-				dueDate.setText(mdl.getDueDate()==null?"":mdl.getDueDate().toString()); // TODO format
+				dueDate.setText(mdl.getDueDate()); // TODO format
 			}
 		};
 		setListAdapter(cursorAdapter);

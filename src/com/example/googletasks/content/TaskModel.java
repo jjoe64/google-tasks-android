@@ -1,7 +1,5 @@
 package com.example.googletasks.content;
 
-import java.util.Date;
-
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -19,7 +17,7 @@ public class TaskModel {
 				+ COLUMN_NAME + " VARCHAR(255),"
 				+ COLUMN_DONE + " INTEGER,"
 				+ COLUMN_NOTES + " LONGTEXT,"
-				+ COLUMN_DUE_DATE + " LONG"
+				+ COLUMN_DUE_DATE + " VARCHAR(50)"
 				+ ");");
 	}
 
@@ -33,10 +31,8 @@ public class TaskModel {
 		mdl.name = c.getString(c.getColumnIndexOrThrow(COLUMN_NAME));
 		mdl.done = c.getInt(c.getColumnIndexOrThrow(COLUMN_DONE))==1;
 		mdl.notes = c.getString(c.getColumnIndexOrThrow(COLUMN_NOTES));
-		Long d = c.getLong(c.getColumnIndexOrThrow(COLUMN_DUE_DATE));
-		if (d != null && d != 0) {
-			mdl.dueDate = new Date(d);
-		}
+		mdl.dueDate = c.getString(c.getColumnIndexOrThrow(COLUMN_DUE_DATE));
+
 		return mdl;
 	}
 
@@ -44,9 +40,9 @@ public class TaskModel {
 	private String name;
 	private boolean done;
 	private String notes;
-	private Date dueDate;
+	private String dueDate;
 
-	public Date getDueDate() {
+	public String getDueDate() {
 		return dueDate;
 	}
 
