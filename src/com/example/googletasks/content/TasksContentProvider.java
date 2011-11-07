@@ -78,9 +78,11 @@ public class TasksContentProvider extends ContentProvider {
 	}
 
 	@Override
-	public int update(Uri uri, ContentValues values, String selection,
-			String[] selectionArgs) {
-		// TODO Auto-generated method stub
+	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+		String id = uri.getLastPathSegment();
+		if (id != null) {
+			return dbHelper.getWritableDatabase().update(TaskModel.TABLE_NAME, values, TaskModel.COLUMN__ID+"=?", new String[] {id});
+		}
 		return 0;
 	}
 

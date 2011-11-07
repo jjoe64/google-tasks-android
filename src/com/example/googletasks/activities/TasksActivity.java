@@ -28,16 +28,22 @@ public class TasksActivity extends ListActivity {
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
+		AdapterView.AdapterContextMenuInfo info;
+		try {
+			info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+		} catch (ClassCastException e) {
+			return false;
+		}
 		if (item.getItemId() == R.id.menu_item_delete_task) {
-			AdapterView.AdapterContextMenuInfo info;
-			try {
-				info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-			} catch (ClassCastException e) {
-				return false;
-			}
 			Uri url = Uri.withAppendedPath(TasksContentProvider.CONTENT_URI, "/"+info.id);
 			getContentResolver().delete(url, null, null);
 			cursorAdapter.getCursor().requery();
+			return true;
+		} else if (item.getItemId() == R.id.menu_item_edit_task) {
+			Intent intent = new Intent(getApplicationContext(), EditTaskActivity.class);
+			Uri url = Uri.withAppendedPath(TasksContentProvider.CONTENT_URI, "/"+info.id);
+			intent.setData(url);
+			startActivity(intent);
 			return true;
 		} else {
 			return super.onContextItemSelected(item);
