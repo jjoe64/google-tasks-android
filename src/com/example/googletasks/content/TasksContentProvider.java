@@ -55,7 +55,7 @@ public class TasksContentProvider extends ContentProvider {
 	public Uri insert(Uri uri, ContentValues values) {
 		long id = dbHelper.getWritableDatabase().insert(TaskModel.TABLE_NAME, null, values);
 		getContext().getContentResolver().notifyChange(uri, null);
-		return Uri.withAppendedPath(CONTENT_URI, "/"+id);
+		return Uri.withAppendedPath(CONTENT_URI, String.valueOf(id));
 	}
 
 	@Override
@@ -66,6 +66,11 @@ public class TasksContentProvider extends ContentProvider {
 
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+		if (uri.getLastPathSegment() != null) {
+			String id = uri.getLastPathSegment();
+			selection = TaskModel.COLUMN__ID+"=?";
+			selectionArgs = new String[] {id};
+		}
 		return dbHelper.getReadableDatabase().query(
 				TaskModel.TABLE_NAME
 				, null // columns
