@@ -5,12 +5,16 @@ import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.CheckBox;
+import android.widget.AdapterView;
+import android.widget.CheckedTextView;
 import android.widget.CursorAdapter;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
@@ -22,6 +26,24 @@ import com.example.googletasks.content.TasksContentProvider;
 public class TasksActivity extends ListActivity {
 	private CursorAdapter cursorAdapter;
 
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.menu_item_delete_task) {
+			AdapterView.AdapterContextMenuInfo info;
+			try {
+				info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+			} catch (ClassCastException e) {
+				return false;
+			}
+			Uri url = Uri.withAppendedPath(TasksContentProvider.CONTENT_URI, "/"+info.id);
+			getContentResolver().delete(url, null, null);
+			cursorAdapter.getCursor().requery();
+			return true;
+		} else {
+			return super.onContextItemSelected(item);
+		}
+	}
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -29,10 +51,10 @@ public class TasksActivity extends ListActivity {
 		setContentView(R.layout.tasks);
 
 		// setup list adapter
-		cursorAdapter = new ResourceCursorAdapter(getApplicationContext(), R.layout.list_tasks_item, null) {
+		cursorAdapter = new ResourceCursorAdapter(getApplicationContext(), R.layout.list_tasks_item, null, true) {
 			@Override
 			public void bindView(View view, Context context, Cursor cursor) {
-				CheckBox name = (CheckBox) view.findViewById(R.id.list_tasks_item_name);
+				CheckedTextView name = (CheckedTextView) view.findViewById(android.R.id.text1);
 				TextView notes = (TextView) view.findViewById(R.id.list_tasks_item_notes);
 				TextView dueDate = (TextView) view.findViewById(R.id.list_tasks_item_due_date);
 
@@ -45,6 +67,9 @@ public class TasksActivity extends ListActivity {
 		};
 		setListAdapter(cursorAdapter);
 
+		// register options menu
+		registerForContextMenu(getListView());
+
 		// load cursor
 		AsyncQueryHandler query = new AsyncQueryHandler(getContentResolver()) {
 			@Override
@@ -54,6 +79,16 @@ public class TasksActivity extends ListActivity {
 			}
 		};
 		query.startQuery(0, 0, TasksContentProvider.CONTENT_URI, null, null, null, null);
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		if (v == getListView()) {
+			MenuInflater inf = getMenuInflater();
+			inf.inflate(R.menu.task_options_menu, menu);
+		} else {
+			super.onCreateContextMenu(menu, v, menuInfo);
+		}
 	}
 
 	@Override

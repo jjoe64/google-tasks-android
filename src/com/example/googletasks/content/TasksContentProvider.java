@@ -35,21 +35,13 @@ public class TasksContentProvider extends ContentProvider {
 
 	@Override
 	public int delete(Uri uri, String where, String[] whereArgs) {
-		/*
-		SQLiteDatabase db = dbHelper.getWritableDatabase();
-		int count;
-		switch (sUriMatcher.match(uri)) {
-		case NOTES:
-		count = db.delete(NOTES_TABLE_NAME, where, whereArgs);
-		break;
-
-		default:
-		throw new IllegalArgumentException("Unknown URI " + uri);
+		String id = uri.getLastPathSegment();
+		if (id != null) {
+			SQLiteDatabase db = dbHelper.getWritableDatabase();
+			int count = db.delete(TaskModel.TABLE_NAME, TaskModel.COLUMN__ID+"=?", new String[] {id});
+			getContext().getContentResolver().notifyChange(uri, null);
+			return count;
 		}
-
-		getContext().getContentResolver().notifyChange(uri, null);
-		return count;
-		*/
 		return 0;
 	}
 
@@ -61,9 +53,9 @@ public class TasksContentProvider extends ContentProvider {
 
 	@Override
 	public Uri insert(Uri uri, ContentValues values) {
-		dbHelper.getWritableDatabase().insert(TaskModel.TABLE_NAME, null, values);
+		long id = dbHelper.getWritableDatabase().insert(TaskModel.TABLE_NAME, null, values);
 		getContext().getContentResolver().notifyChange(uri, null);
-		return null;
+		return Uri.withAppendedPath(CONTENT_URI, "/"+id);
 	}
 
 	@Override
