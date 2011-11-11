@@ -205,6 +205,13 @@ public class TasksActivity extends ListActivity {
 	}
 
 	@Override
+	protected void onPause() {
+		super.onPause();
+
+		unregisterReceiver(serviceReceiver);
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 

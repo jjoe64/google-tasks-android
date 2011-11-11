@@ -65,13 +65,15 @@ public class EditTaskActivity extends Activity {
 	}
 
 	private void save() {
-		ContentValues values = new ContentValues(4);
+		ContentValues values = new ContentValues(5);
 		values.put(TaskModel.COLUMN_DONE, done.isChecked());
 		values.put(TaskModel.COLUMN_NAME, name.getText().toString());
 		values.put(TaskModel.COLUMN_NOTES, notes.getText().toString());
 		if (cbDueDate.isChecked()) {
 			values.put(TaskModel.COLUMN_DUE_DATE, dueDate.getYear()+"-"+dueDate.getMonth()+"-"+dueDate.getDayOfMonth());
 		}
+
+		values.put(TaskModel.COLUMN_MARK_FOR_SYNC, 1);
 
 		if (getIntent().getData() != null) {
 			getContentResolver().update(getIntent().getData(), values, null, null);

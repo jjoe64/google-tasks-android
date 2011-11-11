@@ -10,6 +10,7 @@ public class TaskModel {
 	public static final String COLUMN_DONE = "DONE";
 	public static final String COLUMN_NOTES = "NOTES";
 	public static final String COLUMN_DUE_DATE = "DUE_DATE";
+	public static final String COLUMN_MARK_FOR_SYNC = "MARK_FOR_SYNC";
 
 	public static void createTable(SQLiteDatabase db) {
 		db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
@@ -17,7 +18,8 @@ public class TaskModel {
 				+ COLUMN_NAME + " VARCHAR(255),"
 				+ COLUMN_DONE + " INTEGER,"
 				+ COLUMN_NOTES + " LONGTEXT,"
-				+ COLUMN_DUE_DATE + " VARCHAR(50)"
+				+ COLUMN_DUE_DATE + " VARCHAR(50),"
+				+ COLUMN_MARK_FOR_SYNC + " INTEGER"
 				+ ");");
 	}
 
@@ -32,6 +34,7 @@ public class TaskModel {
 		mdl.done = c.getInt(c.getColumnIndexOrThrow(COLUMN_DONE))==1;
 		mdl.notes = c.getString(c.getColumnIndexOrThrow(COLUMN_NOTES));
 		mdl.dueDate = c.getString(c.getColumnIndexOrThrow(COLUMN_DUE_DATE));
+		mdl.markForSync = c.getInt(c.getColumnIndexOrThrow(COLUMN_MARK_FOR_SYNC))==1;
 
 		return mdl;
 	}
@@ -41,6 +44,7 @@ public class TaskModel {
 	private boolean done;
 	private String notes;
 	private String dueDate;
+	private boolean markForSync;
 
 	public String getDueDate() {
 		return dueDate;
@@ -60,5 +64,9 @@ public class TaskModel {
 
 	public boolean isDone() {
 		return done;
+	}
+
+	public boolean isMarkForSync() {
+		return markForSync;
 	}
 }

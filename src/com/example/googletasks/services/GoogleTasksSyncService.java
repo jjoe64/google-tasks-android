@@ -11,14 +11,19 @@ import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.example.googletasks.ClientCredentials;
+import com.example.googletasks.content.TaskModel;
+import com.example.googletasks.content.TasksContentProvider;
 import com.google.api.client.extensions.android2.AndroidHttp;
 import com.google.api.client.googleapis.auth.oauth2.draft10.GoogleAccessProtectedResource;
 import com.google.api.client.googleapis.extensions.android2.auth.GoogleAccountManager;
@@ -42,6 +47,7 @@ public class GoogleTasksSyncService extends Service {
 
 	private final IBinder mBinder = new LocalBinder();
 	private Tasks service;
+	private boolean authToken;
 	private final HttpTransport transport = AndroidHttp.newCompatibleTransport();
 
 	private final GoogleAccessProtectedResource accessProtectedResource = new GoogleAccessProtectedResource(null);
@@ -54,6 +60,36 @@ public class GoogleTasksSyncService extends Service {
 	public static final String BROADCAST_ACTION_START_INTENT = "com.example.googletasks.action.START_INTENT";
 
 	private GoogleAccountManager accountManager;
+
+	private void createOrUpdateTask(Task task) {
+		Cursor c = getContentResolver().query(
+				TasksContentProvider.CONTENT_URI
+				, null // projection
+				, TaskModel.COLUMN_NAME+"=?"
+				, new String[] {task.getTitle()}
+				, null // sortOrder
+		);
+
+		ContentValues values = new ContentValues(5);
+		values.put(TaskModel.COLUMN_DONE, task.getStatus().equals("completed"));
+		values.put(TaskModel.COLUMN_NAME, task.getTitle());
+		values.put(TaskModel.COLUMN_NOTES, task.getNotes());
+		values.put(TaskModel.COLUMN_DUE_DATE, ""); //TODO task.getDue()
+		values.put(TaskModel.COLUMN_MARK_FOR_SYNC, 0);
+
+		if (c.moveToFirst()) {
+			// update
+			TaskModel mdl = TaskModel.parse(c);
+			if (!mdl.isMarkForSync()) {
+				Uri uri = Uri.withAppendedPath(TasksContentProvider.CONTENT_URI, String.valueOf(mdl.getId()));
+				getContentResolver().update(uri, values, null, null);
+			}
+			// TODO sync
+		} else {
+			// create
+			getContentResolver().insert(TasksContentProvider.CONTENT_URI, values);
+		}
+	}
 
 	public Account[] getAccounts() {
 		return accountManager.getAccounts();
@@ -122,20 +158,8 @@ public class GoogleTasksSyncService extends Service {
 	}
 
 	private void onAuthToken() {
-		try {
-			List<String> taskTitles = new ArrayList<String>();
-			List<Task> tasks = service.tasks().list("@default").execute().getItems();
-			if (tasks != null) {
-				for (Task task : tasks) {
-					taskTitles.add(task.getTitle());
-				}
-			} else {
-				taskTitles.add("No tasks.");
-			}
-			Log.i("GoogleTasksSyncService", "jojojoj: "+taskTitles);
-		} catch (IOException e) {
-			handleException(e);
-		}
+		authToken = true;
+		sync();
 	}
 
 	@Override
@@ -161,5 +185,23 @@ public class GoogleTasksSyncService extends Service {
 		accountManager = new GoogleAccountManager(this);
 		Logger.getLogger("com.google.api.client").setLevel(Level.OFF);
 		gotAccount(false);
+	}
+
+	public void sync() {
+		if (authToken) {
+			try {
+				List<String> taskTitles = new ArrayList<String>();
+				List<Task> tasks = service.tasks().list("@default").execute().getItems();
+				if (tasks != null) {
+					for (Task task : tasks) {
+						createOrUpdateTask(task);
+					}
+				} else {
+					taskTitles.add("No tasks.");
+				}
+			} catch (IOException e) {
+				handleException(e);
+			}
+		}
 	}
 }
