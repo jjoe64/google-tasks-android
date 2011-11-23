@@ -1,5 +1,7 @@
 package com.example.googletasks.content;
 
+import java.util.Calendar;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -46,6 +48,9 @@ public class TaskModel {
 	private String dueDate;
 	private boolean markForSync;
 
+	/**
+	 * @return YYYY-MM-DD
+	 */
 	public String getDueDate() {
 		return dueDate;
 	}
@@ -68,5 +73,15 @@ public class TaskModel {
 
 	public boolean isMarkForSync() {
 		return markForSync;
+	}
+
+	public boolean isOverdue() {
+		if (dueDate == null) return false;
+
+		String dd[] = dueDate.split("-");
+		Calendar test = Calendar.getInstance();
+		test.set(Integer.parseInt(dd[0]), Integer.parseInt(dd[1])-1, Integer.parseInt(dd[2]), 0, 0, 0);
+
+		return test.before(Calendar.getInstance());
 	}
 }

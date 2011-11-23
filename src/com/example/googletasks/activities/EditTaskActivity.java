@@ -59,7 +59,15 @@ public class EditTaskActivity extends Activity {
 				done.setChecked(mdl.isDone());
 				name.setText(mdl.getName());
 				notes.setText(mdl.getNotes());
-				//dueDate.setText(mdl.getDueDate()); // TODO format
+				if (mdl.getDueDate() != null) {
+					String dd[] = mdl.getDueDate().split("-");
+					dueDate.updateDate(Integer.parseInt(dd[0]), Integer.parseInt(dd[1])-1, Integer.parseInt(dd[2]));
+					dueDate.setVisibility(View.VISIBLE);
+					cbDueDate.setChecked(true);
+				} else {
+					dueDate.setVisibility(View.GONE);
+					cbDueDate.setChecked(false);
+				}
 			}
 		}
 	}
@@ -70,7 +78,7 @@ public class EditTaskActivity extends Activity {
 		values.put(TaskModel.COLUMN_NAME, name.getText().toString());
 		values.put(TaskModel.COLUMN_NOTES, notes.getText().toString());
 		if (cbDueDate.isChecked()) {
-			values.put(TaskModel.COLUMN_DUE_DATE, dueDate.getYear()+"-"+dueDate.getMonth()+"-"+dueDate.getDayOfMonth());
+			values.put(TaskModel.COLUMN_DUE_DATE, dueDate.getYear()+"-"+(dueDate.getMonth()+1)+"-"+dueDate.getDayOfMonth());
 		}
 
 		values.put(TaskModel.COLUMN_MARK_FOR_SYNC, 1);

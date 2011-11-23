@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -134,6 +135,12 @@ public class TasksActivity extends ListActivity {
 				name.setText(mdl.getName());
 				notes.setText(mdl.getNotes());
 				dueDate.setText(mdl.getDueDate()); // TODO format
+
+				if (mdl.isOverdue()) {
+					view.setBackgroundColor(Color.RED);
+				} else {
+					view.setBackgroundColor(Color.TRANSPARENT);
+				}
 			}
 		};
 		setListAdapter(cursorAdapter);
@@ -177,7 +184,7 @@ public class TasksActivity extends ListActivity {
 				}
 				builder.setItems(names, new DialogInterface.OnClickListener() {
 					@Override
-			public void onClick(DialogInterface dialog, int which) {
+					public void onClick(DialogInterface dialog, int which) {
 						service.gotAccount(accounts[which]);
 					}
 				});
