@@ -52,6 +52,7 @@ public class TaskModel {
 	 * @return YYYY-MM-DD
 	 */
 	public String getDueDate() {
+		if (dueDate == null || dueDate.length() == 0) return null;
 		return dueDate;
 	}
 
@@ -76,7 +77,7 @@ public class TaskModel {
 	}
 
 	public boolean isOverdue() {
-		if (dueDate == null) return false;
+		if (getDueDate() == null) return false;
 
 		String dd[] = dueDate.split("-");
 		Calendar test = Calendar.getInstance();

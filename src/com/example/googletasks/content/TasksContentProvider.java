@@ -86,7 +86,9 @@ public class TasksContentProvider extends ContentProvider {
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 		String id = uri.getLastPathSegment();
 		if (id != null) {
-			return dbHelper.getWritableDatabase().update(TaskModel.TABLE_NAME, values, TaskModel.COLUMN__ID+"=?", new String[] {id});
+			int r = dbHelper.getWritableDatabase().update(TaskModel.TABLE_NAME, values, TaskModel.COLUMN__ID+"=?", new String[] {id});
+			getContext().getContentResolver().notifyChange(uri, null);
+			return r;
 		}
 		return 0;
 	}

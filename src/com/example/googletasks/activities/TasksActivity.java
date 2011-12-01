@@ -1,22 +1,14 @@
 package com.example.googletasks.activities;
 
-import android.accounts.Account;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.AsyncQueryHandler;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -24,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckedTextView;
 import android.widget.CursorAdapter;
 import android.widget.ResourceCursorAdapter;
@@ -32,65 +25,9 @@ import android.widget.TextView;
 import com.example.googletasks.R;
 import com.example.googletasks.content.TaskModel;
 import com.example.googletasks.content.TasksContentProvider;
-import com.example.googletasks.services.GoogleTasksSyncService;
-import com.example.googletasks.services.GoogleTasksSyncService.LocalBinder;
 
 public class TasksActivity extends ListActivity {
 	private CursorAdapter cursorAdapter;
-
-	private GoogleTasksSyncService service;
-	private boolean serviceBound = false;
-
-	private static final int DIALOG_ACCOUNTS = 0;
-	public static final int REQUEST_AUTHENTICATE = 0;
-
-	private final ServiceConnection mConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			// We've bound to LocalService, cast the IBinder and get LocalService instance
-			LocalBinder binder = (LocalBinder) service;
-			TasksActivity.this.service = binder.getService();
-			serviceBound = true;
-
-			// google auth
-			if (TasksActivity.this.service.gotAccount(false)) {
-				showDialog(DIALOG_ACCOUNTS);
-			}
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName arg0) {
-			serviceBound = false;
-		}
-	};
-
-	private final BroadcastReceiver serviceReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction().equals(GoogleTasksSyncService.BROADCAST_ACTION_START_INTENT)) {
-				// start intent for result
-				Intent startIntent = (Intent) intent.getParcelableExtra("startIntent");
-				startActivityForResult(startIntent, TasksActivity.REQUEST_AUTHENTICATE);
-			}
-		}
-	};
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		switch (requestCode) {
-			case REQUEST_AUTHENTICATE:
-				if (resultCode == RESULT_OK) {
-					// google auth
-					if (TasksActivity.this.service.gotAccount(false)) {
-						showDialog(DIALOG_ACCOUNTS);
-					}
-				} else {
-					showDialog(DIALOG_ACCOUNTS);
-				}
-				break;
-		}
-	}
 
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
@@ -145,6 +82,19 @@ public class TasksActivity extends ListActivity {
 		};
 		setListAdapter(cursorAdapter);
 
+		//
+		getListView().setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Uri url = Uri.withAppendedPath(TasksContentProvider.CONTENT_URI, "/"+id);
+				ContentValues values = new ContentValues(1);
+				CheckedTextView ch = (CheckedTextView) view.findViewById(android.R.id.text1);
+				ch.toggle();
+				values.put(TaskModel.COLUMN_DONE, ch.isChecked());
+				getContentResolver().update(url, values, null, null);
+			}
+		});
+
 		// register options menu
 		registerForContextMenu(getListView());
 
@@ -170,30 +120,6 @@ public class TasksActivity extends ListActivity {
 	}
 
 	@Override
-	protected Dialog onCreateDialog(int id) {
-		switch (id) {
-			case DIALOG_ACCOUNTS:
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setTitle("Select a Google account");
-
-				final Account[] accounts = service.getAccounts();
-				final int size = accounts.length;
-				String[] names = new String[size];
-				for (int i = 0; i < size; i++) {
-					names[i] = accounts[i].name;
-				}
-				builder.setItems(names, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						service.gotAccount(accounts[which]);
-					}
-				});
-				return builder.create();
-		}
-		return null;
-	}
-
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.tasks_menu, menu);
@@ -208,40 +134,6 @@ public class TasksActivity extends ListActivity {
 			return true;
 		} else {
 			return super.onMenuItemSelected(featureId, item);
-		}
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-
-		unregisterReceiver(serviceReceiver);
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		registerReceiver(
-			serviceReceiver , new IntentFilter(GoogleTasksSyncService.BROADCAST_ACTION_START_INTENT)
-		);
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
-
-		Intent intent = new Intent(this, GoogleTasksSyncService.class);
-		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		// Unbind from the service
-		if (serviceBound) {
-			unbindService(mConnection);
-			serviceBound = false;
 		}
 	}
 }

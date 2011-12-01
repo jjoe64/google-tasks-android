@@ -5,10 +5,6 @@
     android:versionName="1.0" >
 
     <uses-sdk android:minSdkVersion="7" />
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -24,7 +20,6 @@
         </activity>
         <activity android:name=".activities.EditTaskActivity"></activity>
         <provider android:authorities="com.example.googletasks.contentprovider" android:name=".content.TasksContentProvider"></provider>
-        <service android:name=".services.GoogleTasksSyncService"></service>
     </application>
 
 </manifest>
