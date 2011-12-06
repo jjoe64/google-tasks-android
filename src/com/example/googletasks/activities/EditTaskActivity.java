@@ -94,8 +94,6 @@ public class EditTaskActivity extends Activity {
 			values.put(TaskModel.COLUMN_DUE_DATE, dueDate.getYear()+"-"+(dueDate.getMonth()+1)+"-"+dueDate.getDayOfMonth());
 		}
 
-		values.put(TaskModel.COLUMN_MARK_FOR_SYNC, 1);
-
 		if (getIntent().getData() != null) {
 			getContentResolver().update(getIntent().getData(), values, null, null);
 		} else {

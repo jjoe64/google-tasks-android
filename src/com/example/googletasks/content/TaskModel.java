@@ -12,7 +12,6 @@ public class TaskModel {
 	public static final String COLUMN_DONE = "DONE";
 	public static final String COLUMN_NOTES = "NOTES";
 	public static final String COLUMN_DUE_DATE = "DUE_DATE";
-	public static final String COLUMN_MARK_FOR_SYNC = "MARK_FOR_SYNC";
 
 	public static void createTable(SQLiteDatabase db) {
 		db.execSQL("CREATE TABLE " + TABLE_NAME + " ("
@@ -20,8 +19,7 @@ public class TaskModel {
 				+ COLUMN_NAME + " VARCHAR(255),"
 				+ COLUMN_DONE + " INTEGER,"
 				+ COLUMN_NOTES + " LONGTEXT,"
-				+ COLUMN_DUE_DATE + " VARCHAR(50),"
-				+ COLUMN_MARK_FOR_SYNC + " INTEGER"
+				+ COLUMN_DUE_DATE + " VARCHAR(50)"
 				+ ");");
 	}
 
