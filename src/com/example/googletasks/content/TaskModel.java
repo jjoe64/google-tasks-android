@@ -36,7 +36,6 @@ public class TaskModel {
 		mdl.done = c.getInt(c.getColumnIndexOrThrow(COLUMN_DONE))==1;
 		mdl.notes = c.getString(c.getColumnIndexOrThrow(COLUMN_NOTES));
 		mdl.dueDate = c.getString(c.getColumnIndexOrThrow(COLUMN_DUE_DATE));
-		mdl.markForSync = c.getInt(c.getColumnIndexOrThrow(COLUMN_MARK_FOR_SYNC))==1;
 
 		return mdl;
 	}
@@ -46,7 +45,6 @@ public class TaskModel {
 	private boolean done;
 	private String notes;
 	private String dueDate;
-	private boolean markForSync;
 
 	/**
 	 * @return YYYY-MM-DD
@@ -70,10 +68,6 @@ public class TaskModel {
 
 	public boolean isDone() {
 		return done;
-	}
-
-	public boolean isMarkForSync() {
-		return markForSync;
 	}
 
 	public boolean isOverdue() {
