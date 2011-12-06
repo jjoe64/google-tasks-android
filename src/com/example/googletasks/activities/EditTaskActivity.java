@@ -82,6 +82,7 @@ public class EditTaskActivity extends Activity {
 					cbDueDate.setChecked(false);
 				}
 			}
+			cursor.close();
 		}
 	}
 
