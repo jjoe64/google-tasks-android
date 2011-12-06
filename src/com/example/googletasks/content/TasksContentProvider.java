@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
-import android.os.StrictMode;
 
 public class TasksContentProvider extends ContentProvider {
 	private static class DatabaseHelper extends SQLiteOpenHelper {
@@ -61,7 +60,7 @@ public class TasksContentProvider extends ContentProvider {
 
 	@Override
 	public boolean onCreate() {
-
+/*
         StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
         .detectAll()
         .penaltyLog()
@@ -72,7 +71,7 @@ public class TasksContentProvider extends ContentProvider {
         .penaltyLog()
         .penaltyDeath()
         .build());
-
+*/
 		dbHelper = new DatabaseHelper(getContext());
 		return true;
 	}

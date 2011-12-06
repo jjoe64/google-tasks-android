@@ -29,18 +29,16 @@ public class EditTaskActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
         .detectAll()
         .penaltyLog()
-        .penaltyDeath()
         .build());
         StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
         .detectAll()
         .penaltyLog()
-        .penaltyDeath()
         .build());
 
-		setContentView(R.layout.edit_task);
+        setContentView(R.layout.edit_task);
 
 		done = (CheckBox) findViewById(R.id.edit_task_done);
 		name = (EditText) findViewById(R.id.edit_task_name);
@@ -84,6 +82,18 @@ public class EditTaskActivity extends Activity {
 			}
 			cursor.close();
 		}
+
+		// wiederherstellen nach kill
+		if (savedInstanceState != null) {
+			name.setText(savedInstanceState.getString("name"));
+			// ...
+		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString("name", name.getText().toString());
 	}
 
 	private void save() {
